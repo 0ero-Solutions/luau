@@ -93,7 +93,9 @@ static int math_atan(lua_State* L)
 
 static int math_atan2(lua_State* L)
 {
-    lua_pushnumber(L, atan2(luaL_checknumber(L, 1), luaL_checknumber(L, 2)));
+    double y = luaL_checknumber(L, 1);
+    double x = luaL_checknumber(L, 2);
+    lua_pushnumber(L, atan2(y, x));
     return 1;
 }
 
@@ -111,7 +113,9 @@ static int math_floor(lua_State* L)
 
 static int math_fmod(lua_State* L)
 {
-    lua_pushnumber(L, fmod(luaL_checknumber(L, 1), luaL_checknumber(L, 2)));
+    double x = luaL_checknumber(L, 1);
+    double y = luaL_checknumber(L, 2);
+    lua_pushnumber(L, fmod(x, y));
     return 1;
 }
 
@@ -132,7 +136,9 @@ static int math_sqrt(lua_State* L)
 
 static int math_pow(lua_State* L)
 {
-    lua_pushnumber(L, pow(luaL_checknumber(L, 1), luaL_checknumber(L, 2)));
+    double x = luaL_checknumber(L, 1);
+    double y = luaL_checknumber(L, 2);
+    lua_pushnumber(L, pow(x, y));
     return 1;
 }
 
@@ -190,7 +196,9 @@ static int math_frexp(lua_State* L)
 
 static int math_ldexp(lua_State* L)
 {
-    lua_pushnumber(L, ldexp(luaL_checknumber(L, 1), luaL_checkinteger(L, 2)));
+    double x = luaL_checknumber(L, 1);
+    int e = luaL_checkinteger(L, 2);
+    lua_pushnumber(L, ldexp(x, e));
     return 1;
 }
 

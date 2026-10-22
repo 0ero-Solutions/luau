@@ -230,7 +230,7 @@ static int tmove(lua_State* L)
 
 static void addfield(lua_State* L, luaL_Strbuf* b, int i, LuaTable* t)
 {
-    if (t && unsigned(i - 1) < unsigned(t->sizearray) && ttisstring(&t->array[i - 1]))
+    if (t && unsigned(i) - 1 < unsigned(t->sizearray) && ttisstring(&t->array[i - 1]))
     {
         TString* ts = tsvalue(&t->array[i - 1]);
         luaL_addlstring(b, getstr(ts), ts->len);

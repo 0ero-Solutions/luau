@@ -859,7 +859,7 @@ struct Compiler
             int fi = fc.type == Constant::Type_Number ? luai_d2i32(fc.valueNumber) : -1;
             int wi = wc.type == Constant::Type_Number ? luai_d2i32(wc.valueNumber) : -1;
 
-            if (fi >= 0 && wi > 0 && fi + wi <= 32)
+            if (fi >= 0 && wi > 0 && wi <= 32 - fi)
             {
                 int fwp = fi | ((wi - 1) << 5);
                 int32_t cid = bytecode.addConstantNumber(fwp);

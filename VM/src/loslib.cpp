@@ -207,7 +207,9 @@ static int os_time(lua_State* L)
 
 static int os_difftime(lua_State* L)
 {
-    lua_pushnumber(L, difftime((time_t)luai_d2i64(luaL_checknumber(L, 1)), (time_t)luai_d2i64(luaL_optnumber(L, 2, 0))));
+    time_t t1 = (time_t)luai_d2i64(luaL_checknumber(L, 1));
+    time_t t2 = (time_t)luai_d2i64(luaL_optnumber(L, 2, 0));
+    lua_pushnumber(L, difftime(t1, t2));
     return 1;
 }
 

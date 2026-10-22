@@ -66,6 +66,11 @@ static int b_not(lua_State* L)
     return 1;
 }
 
+static int clampshift(int i)
+{
+    return i < -NBITS ? -NBITS : (i > NBITS ? NBITS : i);
+}
+
 static int b_shift(lua_State* L, b_uint r, int i)
 {
     if (i < 0)
@@ -91,18 +96,22 @@ static int b_shift(lua_State* L, b_uint r, int i)
 
 static int b_lshift(lua_State* L)
 {
-    return b_shift(L, luaL_checkunsigned(L, 1), luaL_checkinteger(L, 2));
+    b_uint r = luaL_checkunsigned(L, 1);
+    int i = clampshift(luaL_checkinteger(L, 2));
+    return b_shift(L, r, i);
 }
 
 static int b_rshift(lua_State* L)
 {
-    return b_shift(L, luaL_checkunsigned(L, 1), -luaL_checkinteger(L, 2));
+    b_uint r = luaL_checkunsigned(L, 1);
+    int i = clampshift(luaL_checkinteger(L, 2));
+    return b_shift(L, r, -i);
 }
 
 static int b_arshift(lua_State* L)
 {
     b_uint r = luaL_checkunsigned(L, 1);
-    int i = luaL_checkinteger(L, 2);
+    int i = clampshift(luaL_checkinteger(L, 2));
     if (i < 0 || !(r & ((b_uint)1 << (NBITS - 1))))
         return b_shift(L, r, -i);
     else
@@ -134,7 +143,8 @@ static int b_lrot(lua_State* L)
 
 static int b_rrot(lua_State* L)
 {
-    return b_rot(L, -luaL_checkinteger(L, 2));
+    int i = luaL_checkinteger(L, 2);
+    return b_rot(L, -(i & (NBITS - 1)));
 }
 
 /*
@@ -149,7 +159,7 @@ static int fieldargs(lua_State* L, int farg, int* width)
     int w = luaL_optinteger(L, farg + 1, 1);
     luaL_argcheck(L, 0 <= f, farg, "field cannot be negative");
     luaL_argcheck(L, 0 < w, farg + 1, "width must be positive");
-    if (f + w > NBITS)
+    if (f > NBITS - w)
         luaL_error(L, "trying to access non-existent bits");
     *width = w;
     return f;
@@ -171,7 +181,7 @@ static int b_replace(lua_State* L)
     b_uint r = luaL_checkunsigned(L, 1);
     b_uint v = luaL_checkunsigned(L, 2);
     int f = fieldargs(L, 3, &w);
-    int m = mask(w);
+    b_uint m = mask(w);
     v &= m; // erase bits outside given width
     r = (r & ~(m << f)) | (v << f);
     lua_pushunsigned(L, r);

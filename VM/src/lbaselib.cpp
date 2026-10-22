@@ -240,7 +240,7 @@ int luaB_inext(lua_State* L)
 {
     int i = luaL_checkinteger(L, 2);
     luaL_checktype(L, 1, LUA_TTABLE);
-    i++; // next value
+    i = int(unsigned(i) + 1); // next value
     lua_pushinteger(L, i);
     lua_rawgeti(L, 1, i);
     return (lua_isnil(L, -1)) ? 0 : 2;

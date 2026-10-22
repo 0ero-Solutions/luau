@@ -625,7 +625,7 @@ static int luauF_extract(lua_State* L, StkId res, TValue* arg0, int nresults, St
             double a3 = nvalue(args + 1);
             int w = luai_d2i32(a3);
 
-            if (f >= 0 && w > 0 && f + w <= 32)
+            if (f >= 0 && w > 0 && w <= 32 - f)
             {
                 uint32_t m = ~(0xfffffffeu << (w - 1));
                 uint32_t r = (n >> f) & m;
@@ -654,7 +654,7 @@ static int luauF_lrotate(lua_State* L, StkId res, TValue* arg0, int nresults, St
 #ifdef _MSC_VER
         uint32_t r = _rotl(u, s);
 #else
-        uint32_t r = (u << (s & 31)) | (u >> ((32 - s) & 31));
+        uint32_t r = (u << (s & 31)) | (u >> ((32 - unsigned(s)) & 31));
 #endif
 
         setnvalue(res, double(r));
@@ -718,7 +718,7 @@ static int luauF_replace(lua_State* L, StkId res, TValue* arg0, int nresults, St
             double a4 = nvalue(args + 2);
             int w = luai_d2i32(a4);
 
-            if (f >= 0 && w > 0 && f + w <= 32)
+            if (f >= 0 && w > 0 && w <= 32 - f)
             {
                 uint32_t m = ~(0xfffffffeu << (w - 1));
                 uint32_t r = (n & ~(m << f)) | ((v & m) << f);
@@ -747,7 +747,7 @@ static int luauF_rrotate(lua_State* L, StkId res, TValue* arg0, int nresults, St
 #ifdef _MSC_VER
         uint32_t r = _rotr(u, s);
 #else
-        uint32_t r = (u >> (s & 31)) | (u << ((32 - s) & 31));
+        uint32_t r = (u >> (s & 31)) | (u << ((32 - unsigned(s)) & 31));
 #endif
 
         setnvalue(res, double(r));
@@ -1144,7 +1144,7 @@ static int luauF_select(lua_State* L, StkId res, TValue* arg0, int nresults, Stk
             int i = luai_d2i32(nvalue(arg0));
 
             // i >= 1 && i <= n
-            if (unsigned(i - 1) < unsigned(n))
+            if (unsigned(i) - 1 < unsigned(n))
             {
                 setobj2s(L, res, L->base - n + (i - 1));
                 return 1;

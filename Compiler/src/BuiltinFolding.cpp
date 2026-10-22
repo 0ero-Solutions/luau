@@ -341,7 +341,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
             int f = luai_d2i32(args[1].valueNumber);
             int w = count == 2 ? 1 : luai_d2i32(args[2].valueNumber);
 
-            if (f >= 0 && w > 0 && f + w <= 32)
+            if (f >= 0 && w > 0 && w <= 32 - f)
             {
                 uint32_t m = ~(0xfffffffeu << (w - 1));
 
@@ -356,7 +356,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
             uint32_t u = bit32(args[0].valueNumber);
             int s = luai_d2i32(args[1].valueNumber);
 
-            return cnum(double((u << (s & 31)) | (u >> ((32 - s) & 31))));
+            return cnum(double((u << (s & 31)) | (u >> ((32 - unsigned(s)) & 31))));
         }
         break;
 
@@ -380,7 +380,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
             int f = luai_d2i32(args[2].valueNumber);
             int w = count == 3 ? 1 : luai_d2i32(args[3].valueNumber);
 
-            if (f >= 0 && w > 0 && f + w <= 32)
+            if (f >= 0 && w > 0 && w <= 32 - f)
             {
                 uint32_t m = ~(0xfffffffeu << (w - 1));
 
@@ -395,7 +395,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
             uint32_t u = bit32(args[0].valueNumber);
             int s = luai_d2i32(args[1].valueNumber);
 
-            return cnum(double((u >> (s & 31)) | (u << ((32 - s) & 31))));
+            return cnum(double((u >> (s & 31)) | (u << ((32 - unsigned(s)) & 31))));
         }
         break;
 
