@@ -2,6 +2,7 @@
 #include "BuiltinFolding.h"
 
 #include "Luau/Bytecode.h"
+#include "Luau/NumCast.h"
 
 #include <math.h>
 
@@ -80,7 +81,7 @@ static Constant ctype(const Constant& c)
 static uint32_t bit32(double v)
 {
     // convert through signed 64-bit integer to match runtime behavior and gracefully truncate negative integers
-    return uint32_t(int64_t(v));
+    return luai_d2u32(v);
 }
 
 Constant foldBuiltin(int bfid, const Constant* args, size_t count)
@@ -151,7 +152,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
 
     case LBF_MATH_LDEXP:
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
-            return cnum(ldexp(args[0].valueNumber, int(args[1].valueNumber)));
+            return cnum(ldexp(args[0].valueNumber, luai_d2i32(args[1].valueNumber)));
         break;
 
     case LBF_MATH_LOG10:
@@ -252,7 +253,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int s = int(args[1].valueNumber);
+            int s = luai_d2i32(args[1].valueNumber);
 
             if (unsigned(s) < 32)
                 return cnum(double(uint32_t(int32_t(u) >> s)));
@@ -337,8 +338,8 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
             (count == 2 || args[2].type == Constant::Type_Number))
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int f = int(args[1].valueNumber);
-            int w = count == 2 ? 1 : int(args[2].valueNumber);
+            int f = luai_d2i32(args[1].valueNumber);
+            int w = count == 2 ? 1 : luai_d2i32(args[2].valueNumber);
 
             if (f >= 0 && w > 0 && f + w <= 32)
             {
@@ -353,7 +354,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int s = int(args[1].valueNumber);
+            int s = luai_d2i32(args[1].valueNumber);
 
             return cnum(double((u << (s & 31)) | (u >> ((32 - s) & 31))));
         }
@@ -363,7 +364,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int s = int(args[1].valueNumber);
+            int s = luai_d2i32(args[1].valueNumber);
 
             if (unsigned(s) < 32)
                 return cnum(double(u << s));
@@ -376,8 +377,8 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         {
             uint32_t n = bit32(args[0].valueNumber);
             uint32_t v = bit32(args[1].valueNumber);
-            int f = int(args[2].valueNumber);
-            int w = count == 3 ? 1 : int(args[3].valueNumber);
+            int f = luai_d2i32(args[2].valueNumber);
+            int w = count == 3 ? 1 : luai_d2i32(args[3].valueNumber);
 
             if (f >= 0 && w > 0 && f + w <= 32)
             {
@@ -392,7 +393,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int s = int(args[1].valueNumber);
+            int s = luai_d2i32(args[1].valueNumber);
 
             return cnum(double((u >> (s & 31)) | (u << ((32 - s) & 31))));
         }
@@ -402,7 +403,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         if (count == 2 && args[0].type == Constant::Type_Number && args[1].type == Constant::Type_Number)
         {
             uint32_t u = bit32(args[0].valueNumber);
-            int s = int(args[1].valueNumber);
+            int s = luai_d2i32(args[1].valueNumber);
 
             if (unsigned(s) < 32)
                 return cnum(double(u >> s));
@@ -422,7 +423,7 @@ Constant foldBuiltin(int bfid, const Constant* args, size_t count)
         }
         else if (count == 2 && args[0].type == Constant::Type_String && args[1].type == Constant::Type_Number)
         {
-            int i = int(args[1].valueNumber);
+            int i = luai_d2i32(args[1].valueNumber);
 
             if (i > 0 && unsigned(i) <= args[0].stringLength)
                 return cnum(double(uint8_t(args[0].valueString[i - 1])));

@@ -34,6 +34,7 @@ static int foreach (lua_State* L)
 {
     luaL_checktype(L, 1, LUA_TTABLE);
     luaL_checktype(L, 2, LUA_TFUNCTION);
+    luaH_checkiter(L, hvalue(L->base));
     lua_pushnil(L); // first key
     while (lua_next(L, 1))
     {

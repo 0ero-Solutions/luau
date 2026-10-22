@@ -543,6 +543,17 @@ static LuaNode* getfreepos(LuaTable* t)
 */
 static TValue* newkey(lua_State* L, LuaTable* t, const TValue* key)
 {
+    switch (ttype(key))
+    {
+    case LUA_TNUMBER:
+    case LUA_TVECTOR:
+    case LUA_TSTRING:
+    case LUA_TBOOLEAN:
+        break;
+    default:
+        luaH_setobjkeys(t);
+    }
+
     // enforce boundary invariant
     if (ttisnumber(key) && nvalue(key) == t->sizearray + 1)
     {
@@ -827,7 +838,15 @@ LuaTable* luaH_clone(lua_State* L, LuaTable* tt)
         t->lastfree = tt->lastfree;
     }
 
+    if (luaH_hasobjkeys(tt))
+        luaH_setobjkeys(t);
+
     return t;
+}
+
+void luaH_iterforbidden(lua_State* L)
+{
+    luaG_runerror(L, "iteration over a table with object keys is not deterministic");
 }
 
 void luaH_clear(LuaTable* tt)
@@ -853,6 +872,8 @@ void luaH_clear(LuaTable* tt)
             gnext(n) = 0;
         }
     }
+
+    luaH_clearobjkeys(tt);
 
     // back to empty -> no tag methods present
     tt->tmcache = cast_byte(~0);

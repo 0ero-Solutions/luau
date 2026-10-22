@@ -3,6 +3,7 @@
 
 #include "lcommon.h"
 #include "lbuffer.h"
+#include "lnumutils.h"
 
 #if defined(LUAU_BIG_ENDIAN)
 #include <endian.h>
@@ -251,7 +252,7 @@ static int buffer_readbits(lua_State* L)
 {
     size_t len = 0;
     void* buf = luaL_checkbuffer(L, 1, &len);
-    int64_t bitoffset = (int64_t)luaL_checknumber(L, 2);
+    int64_t bitoffset = luai_d2i64(luaL_checknumber(L, 2));
     int bitcount = luaL_checkinteger(L, 3);
 
     if (bitoffset < 0)
@@ -260,7 +261,7 @@ static int buffer_readbits(lua_State* L)
     if (unsigned(bitcount) > 32)
         luaL_error(L, "bit count is out of range of [0; 32]");
 
-    if (uint64_t(bitoffset + bitcount) > uint64_t(len) * 8)
+    if ((uint64_t(bitoffset) + uint64_t(bitcount)) > uint64_t(len) * 8)
         luaL_error(L, "buffer access out of bounds");
 
     unsigned startbyte = unsigned(bitoffset / 8);
@@ -286,7 +287,7 @@ static int buffer_writebits(lua_State* L)
 {
     size_t len = 0;
     void* buf = luaL_checkbuffer(L, 1, &len);
-    int64_t bitoffset = (int64_t)luaL_checknumber(L, 2);
+    int64_t bitoffset = luai_d2i64(luaL_checknumber(L, 2));
     int bitcount = luaL_checkinteger(L, 3);
     unsigned value = luaL_checkunsigned(L, 4);
 
@@ -296,7 +297,7 @@ static int buffer_writebits(lua_State* L)
     if (unsigned(bitcount) > 32)
         luaL_error(L, "bit count is out of range of [0; 32]");
 
-    if (uint64_t(bitoffset + bitcount) > uint64_t(len) * 8)
+    if ((uint64_t(bitoffset) + uint64_t(bitcount)) > uint64_t(len) * 8)
         luaL_error(L, "buffer access out of bounds");
 
     unsigned startbyte = unsigned(bitoffset / 8);

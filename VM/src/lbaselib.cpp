@@ -6,6 +6,7 @@
 #include "lapi.h"
 #include "ldo.h"
 #include "ludata.h"
+#include "ltable.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -214,6 +215,7 @@ static int luaB_typeof(lua_State* L)
 int luaB_next(lua_State* L)
 {
     luaL_checktype(L, 1, LUA_TTABLE);
+    luaH_checkiter(L, hvalue(L->base));
     lua_settop(L, 2); // create a 2nd argument if there isn't one
     if (lua_next(L, 1))
         return 2;
@@ -227,6 +229,7 @@ int luaB_next(lua_State* L)
 static int luaB_pairs(lua_State* L)
 {
     luaL_checktype(L, 1, LUA_TTABLE);
+    luaH_checkiter(L, hvalue(L->base));
     lua_pushvalue(L, lua_upvalueindex(1)); // return generator,
     lua_pushvalue(L, 1);                   // state,
     lua_pushnil(L);                        // and initial value

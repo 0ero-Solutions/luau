@@ -3,6 +3,7 @@
 #include "lualib.h"
 
 #include "lcommon.h"
+#include "lnumutils.h"
 
 #include <string.h>
 #include <time.h>
@@ -112,7 +113,7 @@ static int getfield(lua_State* L, const char* key, int d)
 static int os_date(lua_State* L)
 {
     const char* s = luaL_optstring(L, 1, "%c");
-    time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2, time(NULL));
+    time_t t = (lua_isnoneornil(L, 2) ? time(NULL) : (time_t)luai_d2i64(luaL_checknumber(L, 2)));
 
     struct tm tm;
     struct tm* stm;
@@ -206,7 +207,7 @@ static int os_time(lua_State* L)
 
 static int os_difftime(lua_State* L)
 {
-    lua_pushnumber(L, difftime((time_t)(luaL_checknumber(L, 1)), (time_t)(luaL_optnumber(L, 2, 0))));
+    lua_pushnumber(L, difftime((time_t)luai_d2i64(luaL_checknumber(L, 1)), (time_t)luai_d2i64(luaL_optnumber(L, 2, 0))));
     return 1;
 }
 

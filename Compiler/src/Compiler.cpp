@@ -4,6 +4,7 @@
 #include "Luau/Parser.h"
 #include "Luau/BytecodeBuilder.h"
 #include "Luau/Common.h"
+#include "Luau/NumCast.h"
 #include "Luau/TimeTrace.h"
 
 #include "Builtins.h"
@@ -855,8 +856,8 @@ struct Compiler
             Constant fc = getConstant(expr->args.data[1]);
             Constant wc = getConstant(expr->args.data[2]);
 
-            int fi = fc.type == Constant::Type_Number ? int(fc.valueNumber) : -1;
-            int wi = wc.type == Constant::Type_Number ? int(wc.valueNumber) : -1;
+            int fi = fc.type == Constant::Type_Number ? luai_d2i32(fc.valueNumber) : -1;
+            int wi = wc.type == Constant::Type_Number ? luai_d2i32(wc.valueNumber) : -1;
 
             if (fi >= 0 && wi > 0 && fi + wi <= 32)
             {

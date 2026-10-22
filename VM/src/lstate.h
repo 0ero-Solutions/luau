@@ -174,6 +174,7 @@ typedef struct global_State
 
     uint8_t currentwhite;
     uint8_t gcstate; // state of garbage collector
+    uint8_t deterministiciter; // iteration over tables with object keys raises an error
 
 
     GCObject* gray;      // list of gray objects

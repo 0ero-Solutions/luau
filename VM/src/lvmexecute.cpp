@@ -672,7 +672,7 @@ reentry:
                     LuaTable* h = hvalue(rb);
 
                     double indexd = nvalue(rc);
-                    int index = int(indexd);
+                    int index = luai_d2i32(indexd);
 
                     // index has to be an exact integer and in-bounds for the array portion
                     if (LUAU_LIKELY(unsigned(index) - 1 < unsigned(h->sizearray) && !h->metatable && double(index) == indexd))
@@ -702,7 +702,7 @@ reentry:
                     LuaTable* h = hvalue(rb);
 
                     double indexd = nvalue(rc);
-                    int index = int(indexd);
+                    int index = luai_d2i32(indexd);
 
                     // index has to be an exact integer and in-bounds for the array portion
                     if (LUAU_LIKELY(unsigned(index) - 1 < unsigned(h->sizearray) && !h->metatable && !h->readonly && double(index) == indexd))
@@ -2331,6 +2331,9 @@ reentry:
                     }
                     else if (ttistable(ra))
                     {
+                        VM_PROTECT_PC();
+                        luaH_checkiter(L, hvalue(ra));
+
                         // set up registers for builtin iteration
                         setobj2s(L, ra + 1, ra);
                         setpvalue(ra + 2, reinterpret_cast<void*>(uintptr_t(0)), LU_TAG_ITERATOR);
@@ -2398,6 +2401,9 @@ reentry:
                     }
 
                     int sizenode = 1 << h->lsizenode;
+
+                    VM_PROTECT_PC();
+                    luaH_checkiter(L, h);
 
                     // then we advance index through the hash portion
                     while (unsigned(index - sizearray) < unsigned(sizenode))
@@ -2479,6 +2485,9 @@ reentry:
                 // fast-path: pairs/next
                 if (cl->env->safeenv && ttistable(ra + 1) && ttisnil(ra + 2))
                 {
+                    VM_PROTECT_PC();
+                    luaH_checkiter(L, hvalue(ra + 1));
+
                     setnilvalue(ra);
                     // ra+1 is already the table
                     setpvalue(ra + 2, reinterpret_cast<void*>(uintptr_t(0)), LU_TAG_ITERATOR);

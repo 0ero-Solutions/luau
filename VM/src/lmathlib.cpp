@@ -3,6 +3,7 @@
 #include "lualib.h"
 
 #include "lstate.h"
+#include "lnumutils.h"
 
 #include <math.h>
 #include <time.h>
@@ -328,9 +329,9 @@ static float perlin(float x, float y, float z)
     float yflr = floorf(y);
     float zflr = floorf(z);
 
-    int xi = int(xflr) & 255;
-    int yi = int(yflr) & 255;
-    int zi = int(zflr) & 255;
+    int xi = luai_d2i32(xflr) & 255;
+    int yi = luai_d2i32(yflr) & 255;
+    int zi = luai_d2i32(zflr) & 255;
 
     float xf = x - xflr;
     float yf = y - yflr;
